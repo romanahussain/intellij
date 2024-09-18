@@ -1,13 +1,20 @@
 package org.example;
 
+
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 
 public class SimpleHttpServer {
+
+    // Logger instance
+    private static final Logger logger = LoggerFactory.getLogger(SimpleHttpServer.class);
 
     public static void main(String[] args) throws IOException {
         // Create an HttpServer instance listening on port 8080
@@ -21,15 +28,20 @@ public class SimpleHttpServer {
 
         // Start the server
         server.start();
-        System.out.println("Server is running on http://localhost:8080/hello");
+        logger.info("Server started on port 8080. Access http://localhost:8080/hello");
     }
 
     // Custom handler for the /hello endpoint
     static class HelloHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
+            logger.info("Received a request: {}", exchange.getRequestMethod());
+
             // Define a simple response
             String response = "Hello, World!";
+
+            // Log the response message
+            logger.debug("Sending response: {}", response);
 
             // Send response headers (200 OK and the length of the response)
             exchange.sendResponseHeaders(200, response.getBytes().length);
@@ -38,6 +50,8 @@ public class SimpleHttpServer {
             OutputStream os = exchange.getResponseBody();
             os.write(response.getBytes());
             os.close();
+
+            logger.info("Response sent successfully");
         }
     }
 }
